@@ -1,7 +1,11 @@
 import numpy as np
 from math import *
 import matplotlib.pyplot as plt
+import os
 from alive_progress import alive_bar
+from tkinter import *
+from customtkinter import *
+from PIL import ImageTk, Image
 
 def interceptacao(sx, sy, arquivo):
 
@@ -50,7 +54,14 @@ def interceptacao(sx, sy, arquivo):
     # Testa diversos valores de Vx e Vy para encontrar a interceptação em menor tempo
     print("Realizando testes...")
     with alive_bar(10000) as bar:
-        for a in np.linspace(-2.8, 2.8, num=10000):
+        values = np.linspace(-2.8, 2.8, num=10000)
+        update_progress(0)
+        progress = 0
+        for c in range(10000):
+            if c % 500 == 0:
+                progress += 0.05
+                update_progress(progress)
+            a = values[c]
             bar()
             bmais = sqrt((196/25)-a**2)
             bmenos = -(sqrt((196/25)-a**2))
@@ -216,6 +227,7 @@ def interceptacao(sx, sy, arquivo):
         ax1.grid(which='major', alpha=0.5)
         plt.tight_layout()
         plt.savefig("results/trajetoria_de_interceptacao.png", dpi=200)
+        plt.clf()
 
         # Plota a trajetória x da bola e do robô pelo tempo
         fig, ax2 = plt.subplots()
@@ -234,6 +246,7 @@ def interceptacao(sx, sy, arquivo):
         ax2.grid(which='major', alpha=0.5)
         plt.tight_layout()
         plt.savefig("results/posicao_x_tempo.png", dpi=200)
+        plt.clf()
 
         # Plota a trajetória y da bola e do robô pelo tempo
         fig, ax3 = plt.subplots()
@@ -252,6 +265,7 @@ def interceptacao(sx, sy, arquivo):
         ax3.grid(which='major', alpha=0.5)
         plt.tight_layout()
         plt.savefig("results/posicao_y_tempo.png", dpi=200)
+        plt.clf()
 
         # Plota a velocidade x da bola e do robô pelo tempo
         fig, ax4 = plt.subplots()
@@ -265,6 +279,7 @@ def interceptacao(sx, sy, arquivo):
         ax4.grid(which='major', alpha=0.5)
         plt.tight_layout()
         plt.savefig("results/velocidade_x_tempo.png", dpi=200)
+        plt.clf()
 
         # Plota a velocidade y da bola e do robô pelo tempo
         fig, ax5 = plt.subplots()
@@ -278,6 +293,7 @@ def interceptacao(sx, sy, arquivo):
         ax5.grid(which='major', alpha=0.5)
         plt.tight_layout()
         plt.savefig("results/velocidade_y_tempo.png", dpi=200)
+        plt.clf()
 
         # Plota a aceleração x da bola e do robô pelo tempo
         fig, ax6 = plt.subplots()
@@ -291,6 +307,7 @@ def interceptacao(sx, sy, arquivo):
         ax6.grid(which='major', alpha=0.5)
         plt.tight_layout()
         plt.savefig("results/aceleracao_x_tempo.png", dpi=200)
+        plt.clf()
 
         # Plota a aceleração y da bola e do robô pelo tempo
         fig, ax7 = plt.subplots()
@@ -304,10 +321,72 @@ def interceptacao(sx, sy, arquivo):
         ax7.grid(which='major', alpha=0.5)
         plt.tight_layout()
         plt.savefig("results/aceleracao_y_tempo.png", dpi=200)
+        plt.clf()
     except:
         print("Não foi possível encontrar uma trajetória de interceptação.")
 
-sx = float(input("Posição inicial do robô no eixo x: "))
-sy = float(input("Posição inicial do robô no eixo y: "))
+# configura a aparencia da janela
+set_appearance_mode("System")  # Modes: system (default), light, dark
+set_default_color_theme("blue") # Themes: blue (default), dark-blue, green
 
-interceptacao(sx, sy, "trajetoria")
+# lista as trajetorias disponiveis
+trajetorias = os.listdir('trajetorias/')
+files = []
+for x in trajetorias:
+    files.append(x[:-4])
+
+# cria janela
+window = CTk()
+window.title("Projeto Ora Bolas")
+window.geometry("11280x960")
+
+# cria label de seleção de trajetoria
+label_trajetoria = CTkLabel(window, text="Selecione a trajetória desejada:", anchor="center")
+label_trajetoria.pack(anchor=W, padx=10, pady=0)
+
+# cria o menu de seleção de trajetoria
+menu_trajetoria = CTkOptionMenu(master=window, values=files, height=40, width=200)
+menu_trajetoria.pack(anchor=W, padx=10, pady=10)
+menu_trajetoria.set(files[0])
+
+# cria Frame para as entrys
+frame = CTkFrame(window)
+frame.pack(anchor=W, padx=10, pady=10)
+
+# cria os inputs de posição inicial
+label_posicao_inicial = CTkLabel(master=frame, text="Posição inicial do robô (m):")
+label_posicao_inicial.pack(side=TOP, padx=10, pady=10)
+label_posicao_inicial_x = CTkLabel(master=frame, text="X = ", width=20)
+label_posicao_inicial_x.pack(side=LEFT, padx=5, pady=10)
+input_posicao_inicial_x = CTkEntry(master=frame, width=50)
+input_posicao_inicial_x.pack(side=LEFT, padx=10, pady=10)
+label_posicao_inicial_y = CTkLabel(master=frame, text="Y = ", width=20)
+label_posicao_inicial_y.pack(side=LEFT, padx=5, pady=10)
+input_posicao_inicial_y = CTkEntry(master=frame, width=50)
+input_posicao_inicial_y.pack(side=LEFT, padx=10, pady=10)
+
+# cria a função que coleta os inputs e roda o programa
+def run():
+    # coleta os inputs
+    sx = float(input_posicao_inicial_x.get())
+    sy = float(input_posicao_inicial_y.get())
+    trajetoria_selecionada = menu_trajetoria.get()
+
+    # roda o programa
+    interceptacao(sx, sy, trajetoria_selecionada)
+
+# cria botão de execução
+calcular = CTkButton(master=window, text="Calcular", command=run, height=40, width=200)
+calcular.pack(anchor=W, padx=10, pady=10)
+
+# cria a barra de progresso
+progress_var = DoubleVar()
+progress_bar = CTkProgressBar(master=window, orient="horizontal", mode='determinate', height=30, width=200, variable=progress_var)
+progress_bar.pack(anchor=W, padx=10, pady=10)
+
+def update_progress(value):
+    progress_var.set(value)
+    window.update()
+
+# mainloop
+window.mainloop()
