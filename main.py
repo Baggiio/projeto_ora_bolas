@@ -1,6 +1,9 @@
 import numpy as np
 from math import *
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
+from matplotlib.backend_bases import key_press_handler
+from matplotlib.figure import Figure
 import os
 from alive_progress import alive_bar
 from tkinter import *
@@ -326,8 +329,8 @@ def interceptacao(sx, sy, arquivo):
         print("Não foi possível encontrar uma trajetória de interceptação.")
 
 # configura a aparencia da janela
-set_appearance_mode("System")  # Modes: system (default), light, dark
-set_default_color_theme("blue") # Themes: blue (default), dark-blue, green
+set_appearance_mode("light")  # Modes: system (default), light, dark
+set_default_color_theme("green") # Themes: blue (default), dark-blue, green
 
 # lista as trajetorias disponiveis
 trajetorias = os.listdir('trajetorias/')
@@ -340,29 +343,32 @@ window = CTk()
 window.title("Projeto Ora Bolas")
 window.geometry("11280x960")
 
+frame1 = CTkFrame(window)
+frame2 = CTkFrame(window, border_color="black", border_width=5, corner_radius=10)
+
 # cria label de seleção de trajetoria
-label_trajetoria = CTkLabel(window, text="Selecione a trajetória desejada:", anchor="center")
+label_trajetoria = CTkLabel(frame1, text="Selecione a trajetória desejada:", anchor="center")
 label_trajetoria.pack(anchor=W, padx=10, pady=0)
 
 # cria o menu de seleção de trajetoria
-menu_trajetoria = CTkOptionMenu(master=window, values=files, height=40, width=200)
+menu_trajetoria = CTkOptionMenu(master=frame1, values=files, height=40, width=200)
 menu_trajetoria.pack(anchor=W, padx=10, pady=10)
 menu_trajetoria.set(files[0])
 
 # cria Frame para as entrys
-frame = CTkFrame(window)
-frame.pack(anchor=W, padx=10, pady=10)
+inputs = CTkFrame(frame1)
+inputs.pack(anchor=W, padx=10, pady=10)
 
 # cria os inputs de posição inicial
-label_posicao_inicial = CTkLabel(master=frame, text="Posição inicial do robô (m):")
+label_posicao_inicial = CTkLabel(master=inputs, text="Posição inicial do robô (m):")
 label_posicao_inicial.pack(side=TOP, padx=10, pady=10)
-label_posicao_inicial_x = CTkLabel(master=frame, text="X = ", width=20)
+label_posicao_inicial_x = CTkLabel(master=inputs, text="X = ", width=20)
 label_posicao_inicial_x.pack(side=LEFT, padx=5, pady=10)
-input_posicao_inicial_x = CTkEntry(master=frame, width=50)
+input_posicao_inicial_x = CTkEntry(master=inputs, width=50)
 input_posicao_inicial_x.pack(side=LEFT, padx=10, pady=10)
-label_posicao_inicial_y = CTkLabel(master=frame, text="Y = ", width=20)
+label_posicao_inicial_y = CTkLabel(master=inputs, text="Y = ", width=20)
 label_posicao_inicial_y.pack(side=LEFT, padx=5, pady=10)
-input_posicao_inicial_y = CTkEntry(master=frame, width=50)
+input_posicao_inicial_y = CTkEntry(master=inputs, width=50)
 input_posicao_inicial_y.pack(side=LEFT, padx=10, pady=10)
 
 # cria a função que coleta os inputs e roda o programa
@@ -375,18 +381,38 @@ def run():
     # roda o programa
     interceptacao(sx, sy, trajetoria_selecionada)
 
+    # carrega as imagens
+    img_trajetoria = ImageTk.PhotoImage(Image.open("results/trajetoria_de_interceptacao.png"))
+    # img_posicao_x_tempo = ImageTk.PhotoImage(Image.open("results/posicao_x_tempo.png"))
+    # img_posicao_y_tempo = ImageTk.PhotoImage(Image.open("results/posicao_y_tempo.png"))
+    # img_velocidade_x_tempo = ImageTk.PhotoImage(Image.open("results/velocidade_x_tempo.png"))
+    # img_velocidade_y_tempo = ImageTk.PhotoImage(Image.open("results/velocidade_y_tempo.png"))
+    # img_aceleracao_x_tempo = ImageTk.PhotoImage(Image.open("results/aceleracao_x_tempo.png"))
+    # img_aceleracao_y_tempo = ImageTk.PhotoImage(Image.open("results/aceleracao_y_tempo.png"))
+
+    # cria as labels para as imagens
+    label_img_trajetoria = Label(frame2, image=img_trajetoria)
+    label_img_trajetoria.image = img_trajetoria
+    label_img_trajetoria.pack(side=RIGHT, padx=10, pady=10)
+
+    frame2.pack(side=RIGHT, padx=10, pady=10, expand=True)
+
+    window.update()
+
 # cria botão de execução
-calcular = CTkButton(master=window, text="Calcular", command=run, height=40, width=200)
+calcular = CTkButton(master=frame1, text="Calcular", command=run, height=40, width=200)
 calcular.pack(anchor=W, padx=10, pady=10)
 
 # cria a barra de progresso
 progress_var = DoubleVar()
-progress_bar = CTkProgressBar(master=window, orient="horizontal", mode='determinate', height=30, width=200, variable=progress_var)
+progress_bar = CTkProgressBar(master=frame1, orient="horizontal", mode='determinate', height=30, width=200, variable=progress_var)
 progress_bar.pack(anchor=W, padx=10, pady=10)
 
 def update_progress(value):
     progress_var.set(value)
     window.update()
+
+frame1.pack(side=LEFT, padx=10, pady=10)
 
 # mainloop
 window.mainloop()
