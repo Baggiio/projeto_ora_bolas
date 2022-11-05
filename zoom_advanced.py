@@ -5,7 +5,6 @@
 import tkinter as tk
 from tkinter import ttk
 import os, subprocess, sys
-from PIL import Image, ImageTk
 
 try:
     from PIL import Image, ImageTk
