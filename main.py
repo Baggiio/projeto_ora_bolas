@@ -1,9 +1,6 @@
 import numpy as np
 from math import *
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
-from matplotlib.backend_bases import key_press_handler
-from matplotlib.figure import Figure
 import os
 from alive_progress import alive_bar
 from tkinter import *
@@ -56,72 +53,70 @@ def interceptacao(sx, sy, arquivo):
 
     # Testa diversos valores de Vx e Vy para encontrar a interceptação em menor tempo
     print("Realizando testes...")
-    with alive_bar(10000) as bar:
-        values = np.linspace(-2.8, 2.8, num=10000)
-        update_progress(0)
-        progress = 0
-        for c in range(10000):
-            if c % 500 == 0:
-                progress += 0.05
-                update_progress(progress)
-            a = values[c]
-            bar()
-            bmais = sqrt((196/25)-a**2)
-            bmenos = -(sqrt((196/25)-a**2))
-            if wait == 0:
-                for i in range(len(lt)):
-                    x1 = (sx + a*lt[i])
-                    y1 = (sy + bmais*lt[i])
-                    y2 = (sy + bmenos*lt[i])
+    values = np.linspace(-2.8, 2.8, num=10000)
+    update_progress(0)
+    progress = 0
+    for c in range(10000):
+        if c % 500 == 0:
+            progress += 0.05
+            update_progress(progress)
+        a = values[c]
+        bmais = sqrt((196/25)-a**2)
+        bmenos = -(sqrt((196/25)-a**2))
+        if wait == 0:
+            for i in range(len(lt)):
+                x1 = (sx + a*lt[i])
+                y1 = (sy + bmais*lt[i])
+                y2 = (sy + bmenos*lt[i])
 
-                    if abs(lx[i]-x1) <= 0.06 and x1 >= 0:
-                        if abs(ly[i]-y1) <= 0.06 and y1 >= 0:
-                            if x1 > 9 or y1 > 6:
-                                for j in range(i, len(lt)):
-                                    if lx[j] <= 9 and ly[j] <= 6:
-                                        waitj = j
-                                        tempos.append(lt[j])
-                                        wait = 1
-                                        break
-                            else:
-                                vx.append(a)
-                                vy.append(bmais)
-                                tempos.append(lt[i])
-                                found = 1
-                        elif abs(ly[i]-y2) <= 0.06 and y2 >= 0:
-                            if x1 > 9 or y2 > 6:
-                                for j in range(i, len(lt)):
-                                    if lx[j] <= 9 and ly[j] <= 6:
-                                        waitj = j
-                                        tempos.append(lt[j])
-                                        wait = 1
-                                        break
-                            else:
-                                vx.append(a)
-                                vy.append(bmenos)
-                                tempos.append(lt[i])
-                                found = 1
+                if abs(lx[i]-x1) <= 0.06 and x1 >= 0:
+                    if abs(ly[i]-y1) <= 0.06 and y1 >= 0:
+                        if x1 > 9 or y1 > 6:
+                            for j in range(i, len(lt)):
+                                if lx[j] <= 9 and ly[j] <= 6:
+                                    waitj = j
+                                    tempos.append(lt[j])
+                                    wait = 1
+                                    break
                         else:
-                            pass
-            else:
-                for i in range(len(lt)):
-                    x1 = (sx + a*lt[i])
-                    y1 = (sy + bmais*lt[i])
-                    y2 = (sy + bmenos*lt[i])
-
-                    if abs(lx[waitj+2]-x1) <= 0.05 and x1 >= 0:
-                        if abs(ly[waitj+2]-y1) <= 0.05 and y1 >= 0:
                             vx.append(a)
                             vy.append(bmais)
-                            tempos_chegada.append(lt[i])
+                            tempos.append(lt[i])
                             found = 1
-                        elif abs(ly[waitj+2]-y2) <= 0.05 and y2 >= 0:
+                    elif abs(ly[i]-y2) <= 0.06 and y2 >= 0:
+                        if x1 > 9 or y2 > 6:
+                            for j in range(i, len(lt)):
+                                if lx[j] <= 9 and ly[j] <= 6:
+                                    waitj = j
+                                    tempos.append(lt[j])
+                                    wait = 1
+                                    break
+                        else:
                             vx.append(a)
                             vy.append(bmenos)
-                            tempos_chegada.append(lt[i])
+                            tempos.append(lt[i])
                             found = 1
-                        else:
-                            pass
+                    else:
+                        pass
+        else:
+            for i in range(len(lt)):
+                x1 = (sx + a*lt[i])
+                y1 = (sy + bmais*lt[i])
+                y2 = (sy + bmenos*lt[i])
+
+                if abs(lx[waitj+2]-x1) <= 0.05 and x1 >= 0:
+                    if abs(ly[waitj+2]-y1) <= 0.05 and y1 >= 0:
+                        vx.append(a)
+                        vy.append(bmais)
+                        tempos_chegada.append(lt[i])
+                        found = 1
+                    elif abs(ly[waitj+2]-y2) <= 0.05 and y2 >= 0:
+                        vx.append(a)
+                        vy.append(bmenos)
+                        tempos_chegada.append(lt[i])
+                        found = 1
+                    else:
+                        pass
     if found == 0:
         bx = lx[-1]
         by = ly[-1]
@@ -345,6 +340,7 @@ window.geometry("11280x960")
 
 frame1 = CTkFrame(window)
 frame2 = CTkFrame(window, border_color="black", border_width=5, corner_radius=10)
+#frame2 = Frame(window)
 
 # cria label de seleção de trajetoria
 label_trajetoria = CTkLabel(frame1, text="Selecione a trajetória desejada:", anchor="center")
@@ -381,24 +377,11 @@ def run():
     # roda o programa
     interceptacao(sx, sy, trajetoria_selecionada)
 
-    # carrega as imagens
-    img_trajetoria = ImageTk.PhotoImage(Image.open("results/trajetoria_de_interceptacao.png"))
-    # img_posicao_x_tempo = ImageTk.PhotoImage(Image.open("results/posicao_x_tempo.png"))
-    # img_posicao_y_tempo = ImageTk.PhotoImage(Image.open("results/posicao_y_tempo.png"))
-    # img_velocidade_x_tempo = ImageTk.PhotoImage(Image.open("results/velocidade_x_tempo.png"))
-    # img_velocidade_y_tempo = ImageTk.PhotoImage(Image.open("results/velocidade_y_tempo.png"))
-    # img_aceleracao_x_tempo = ImageTk.PhotoImage(Image.open("results/aceleracao_x_tempo.png"))
-    # img_aceleracao_y_tempo = ImageTk.PhotoImage(Image.open("results/aceleracao_y_tempo.png"))
-
-    # cria as labels para as imagens
-    label_img_trajetoria = Label(frame2, image=img_trajetoria)
-    label_img_trajetoria.image = img_trajetoria
-    label_img_trajetoria.pack(side=RIGHT, padx=10, pady=10)
+    valor = grafico_escolha.get()
+    exibe_imagem(valor)
 
     frame2.pack(side=RIGHT, padx=10, pady=10, expand=True)
-
-    window.update()
-
+    
 # cria botão de execução
 calcular = CTkButton(master=frame1, text="Calcular", command=run, height=40, width=200)
 calcular.pack(anchor=W, padx=10, pady=10)
@@ -408,11 +391,68 @@ progress_var = DoubleVar()
 progress_bar = CTkProgressBar(master=frame1, orient="horizontal", mode='determinate', height=30, width=200, variable=progress_var)
 progress_bar.pack(anchor=W, padx=10, pady=10)
 
+def exibe_imagem(value):
+    canvas.delete("all")
+    selection = value
+    print(selection)
+
+    if selection == "Trajetória de interceptação":
+        canvas.delete("all")
+        img_trajetoria = ImageTk.PhotoImage(Image.open("results/trajetoria_de_interceptacao.png"))
+        canvas.create_image(0, 0, anchor=NW, image=img_trajetoria)
+        canvas.img = img_trajetoria
+    elif selection == "Posição X por tempo":
+        canvas.delete("all")
+        img_posicao_x_tempo = ImageTk.PhotoImage(Image.open("results/posicao_x_tempo.png"))
+        canvas.create_image(0, 0, anchor=NW, image=img_posicao_x_tempo)
+        canvas.img = img_posicao_x_tempo
+    elif selection == "Posição Y por tempo":
+        canvas.delete("all")
+        img_posicao_y_tempo = ImageTk.PhotoImage(Image.open("results/posicao_y_tempo.png"))
+        canvas.create_image(0, 0, anchor=NW, image=img_posicao_y_tempo)
+        canvas.img = img_posicao_y_tempo
+    elif selection == "Velocidade X por tempo":
+        canvas.delete("all")
+        img_velocidade_x_tempo = ImageTk.PhotoImage(Image.open("results/velocidade_x_tempo.png"))
+        canvas.create_image(0, 0, anchor=NW, image=img_velocidade_x_tempo)
+        canvas.img = img_velocidade_x_tempo
+    elif selection == "Velocidade Y por tempo":
+        canvas.delete("all")
+        img_velocidade_y_tempo = ImageTk.PhotoImage(Image.open("results/velocidade_y_tempo.png"))
+        canvas.create_image(0, 0, anchor=NW, image=img_velocidade_y_tempo)
+        canvas.img = img_velocidade_y_tempo
+    elif selection == "Aceleração X por tempo":
+        canvas.delete("all")
+        img_aceleracao_x_tempo = ImageTk.PhotoImage(Image.open("results/aceleracao_x_tempo.png"))
+        canvas.create_image(0, 0, anchor=NW, image=img_aceleracao_x_tempo)
+        canvas.img = img_aceleracao_x_tempo
+    elif selection == "Aceleração Y por tempo":
+        canvas.delete("all")
+        img_aceleracao_y_tempo = ImageTk.PhotoImage(Image.open("results/aceleracao_y_tempo.png"))
+        canvas.create_image(0, 0, anchor=NW, image=img_aceleracao_y_tempo)
+        canvas.img = img_aceleracao_y_tempo
+
+    window.update()
+
+# cria label menu gráfico
+label_graficos = CTkLabel(frame1, text="Selecione o gráfico desejado:", anchor="center")
+label_graficos.pack(anchor=W, padx=10, pady=0)
+
+# cria o menu de seleção de gráfico
+grafico_escolha = StringVar()
+menu_grafico = CTkOptionMenu(master=frame1, values=["Trajetória de interceptação", "Posição X por tempo", "Posição Y por tempo", "Velocidade X por tempo", "Velocidade Y por tempo", "Aceleração X por tempo", "Aceleração Y por tempo"], height=40, width=200, variable=grafico_escolha, command=exibe_imagem)
+menu_grafico.pack(anchor=W, padx=10, pady=10)
+menu_grafico.set("Trajetória de interceptação")
+
+canvas = Canvas(frame2, width=1280, height=960)
+canvas.pack(anchor=CENTER, padx=10, pady=10)
+
 def update_progress(value):
     progress_var.set(value)
     window.update()
 
 frame1.pack(side=LEFT, padx=10, pady=10)
+
 
 # mainloop
 window.mainloop()
