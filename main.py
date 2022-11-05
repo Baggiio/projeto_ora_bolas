@@ -1,11 +1,9 @@
 import numpy as np
 from math import *
 import matplotlib.pyplot as plt
-import os
-from alive_progress import alive_bar
+import os, subprocess, sys
 from tkinter import *
 from customtkinter import *
-from PIL import ImageTk, Image
 from zoom_advanced import Zoom_Advanced
 
 def interceptacao(sx, sy, arquivo):
@@ -347,7 +345,9 @@ for x in trajetorias:
 window = CTk()
 window.title("Projeto Ora Bolas")
 window.geometry("11280x960")
+window.state("zoomed")
 
+# cria os frames (divisoes) do programa
 frame1 = CTkFrame(window)
 frame2 = CTkFrame(window, border_color="black", border_width=5, corner_radius=10)
 #frame2 = Frame(window)
@@ -401,12 +401,12 @@ progress_var = DoubleVar()
 progress_bar = CTkProgressBar(master=frame1, orient="horizontal", mode='determinate', height=30, width=200, variable=progress_var)
 progress_bar.pack(anchor=W, padx=10, pady=10)
 
+# exibe imagem com zoom:
 def exibe_imagem(value):
     canvas.delete("all")
 
     if value == "Trajetória de interceptação":
         Zoom_Advanced(canvas, path="results/trajetoria_de_interceptacao.png")
-
     elif value == "Posição X por tempo":
         Zoom_Advanced(canvas, path="results/posicao_x_tempo.png")
     elif value == "Posição Y por tempo":
@@ -422,9 +422,10 @@ def exibe_imagem(value):
 
     window.update()
 
+# exibe imagem sem zoom:
+
 # def exibe_imagem(value):
 #     canvas.delete("all")
-
 #     if value == "Trajetória de interceptação":
 #         img_trajetoria = ImageTk.PhotoImage(Image.open("results/trajetoria_de_interceptacao.png"))
 #         canvas.create_image(0, 0, anchor=NW, image=img_trajetoria)
@@ -453,7 +454,6 @@ def exibe_imagem(value):
 #         img_aceleracao_y_tempo = ImageTk.PhotoImage(Image.open("results/aceleracao_y_tempo.png"))
 #         canvas.create_image(0, 0, anchor=NW, image=img_aceleracao_y_tempo)
 #         canvas.img = img_aceleracao_y_tempo
-
 #     window.update()
 
 # cria label menu gráfico
@@ -465,15 +465,17 @@ menu_grafico = CTkOptionMenu(master=frame1, values=["Trajetória de interceptaç
 menu_grafico.pack(anchor=W, padx=10, pady=10)
 menu_grafico.set("Trajetória de interceptação")
 
+# cria o canvas para exibir as imagens
 canvas = Canvas(frame2, width=1280, height=960)
 canvas.pack(anchor=CENTER, padx=10, pady=10)
 
+# cria a função que atualiza a barra de progresso
 def update_progress(value):
     progress_var.set(value)
     window.update()
 
+# exibe o menu lateral
 frame1.pack(side=LEFT, padx=10, pady=10)
-
 
 # mainloop
 window.mainloop()
