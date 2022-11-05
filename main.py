@@ -75,7 +75,6 @@ def interceptacao(sx, sy, arquivo):
     found = 0
 
     # Testa diversos valores de Vx e Vy para encontrar a interceptação em menor tempo
-    print("Realizando testes...")
     values = np.linspace(-2.8, 2.8, num=10000)
     update_progress(0)
     progress = 0
@@ -180,13 +179,6 @@ def interceptacao(sx, sy, arquivo):
     tempo = (sum(tempos)/len(tempos)) - (0.0965/2.8)
     if wait == 1:
         tempo_chegada = (sum(tempos_chegada)/len(tempos_chegada))
-
-    # Exibe os resultados encontrados
-    print("Ponto de interceptação no menor tempo encontrado!")
-    if wait == 1:
-        print("O robô chegará no instante t = %.2f e deverá esperar a bola retornar ao campo." % tempo_chegada)
-    print("A interceptação ocorrerá no instante t = %.2f." % tempo)
-    print("Para isso, o robô deve utilizar uma velocidade de Vx = %.2f e Vy = %.2f." % (vxf, vyf))
 
     # Cria a trajetória x do robô
     rx = []
@@ -355,6 +347,15 @@ def interceptacao(sx, sy, arquivo):
     plt.savefig("results/aceleracao_y_tempo.png", dpi=200)
     plt.clf()
 
+    # Exibe os resultados
+    label_results.configure(text="Ponto de interceptação no menor tempo encontrado!")
+    if wait == 1:
+        label_wait.configure(text=("O robô chegará no instante t = %.2f e deverá\nesperar a bola retornar ao campo." % tempo_chegada))
+    else:
+        label_wait.configure(text='')
+    label_intercept.configure(text=("O robô interceptará a bola no instante t = %.2f." % tempo))
+    label_velocidade.configure(text=("Para isso, o robô deve utilizar uma velocidade de Vx = %.2f e Vy = %.2f." % (vxf, vyf)))
+
 # configura a aparencia da janela
 set_appearance_mode("light")  # Modes: system (default), light, dark
 set_default_color_theme("green") # Themes: blue (default), dark-blue, green
@@ -492,6 +493,16 @@ menu_grafico.set("Trajetória de interceptação")
 # cria o canvas para exibir as imagens
 canvas = Canvas(frame2, width=1280, height=960)
 canvas.pack(anchor=CENTER, padx=10, pady=10)
+
+# cria os labels de resultado
+label_results = CTkLabel(frame1, text='')
+label_results.pack(anchor=W, padx=10, pady=1)
+label_intercept = CTkLabel(frame1, text='')
+label_intercept.pack(anchor=W, padx=10, pady=1)
+label_velocidade = CTkLabel(frame1, text='')
+label_velocidade.pack(anchor=W, padx=10, pady=1)
+label_wait = CTkLabel(frame1, text='')
+label_wait.pack(anchor=W, padx=10, pady=1)
 
 # cria a função que atualiza a barra de progresso
 def update_progress(value):
