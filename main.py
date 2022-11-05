@@ -1,10 +1,34 @@
-import numpy as np
 from math import *
-import matplotlib.pyplot as plt
 import os, subprocess, sys
-from tkinter import *
-from customtkinter import *
 from zoom_advanced import Zoom_Advanced
+
+try:
+    import numpy as np
+except ImportError or ModuleNotFoundError:
+    print("Numpy não instalado. Instalando...")
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "numpy"])
+    import numpy as np
+
+try:
+    import matplotlib.pyplot as plt
+except ImportError or ModuleNotFoundError:
+    print("Matplotlib não instalado. Instalando...")
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "matplotlib"])
+    import matplotlib.pyplot as plt
+
+try:
+    from tkinter import *
+except ImportError or ModuleNotFoundError:
+    print("Tkinter não instalado. Instalando...")
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "tkinter"])
+    from tkinter import *
+
+try:
+    from customtkinter import *
+except ImportError or ModuleNotFoundError:
+    print("Customtkinter não instalado. Instalando...")
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "customtkinter"])
+    from customtkinter import *
 
 def interceptacao(sx, sy, arquivo):
 

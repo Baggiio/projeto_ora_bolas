@@ -4,8 +4,15 @@
 # constant memory and not crams it with a huge resized image for the large zooms.
 import tkinter as tk
 from tkinter import ttk
+import os, subprocess, sys
 from PIL import Image, ImageTk
 
+try:
+    from PIL import Image, ImageTk
+except ImportError or ModuleNotFoundError:
+    print("PIL não instalado. Instalando...")
+    subprocess.check_call([sys.executable, "-m", "pip", "install", 'pillow'])
+    from PIL import Image, ImageTk
 class AutoScrollbar(ttk.Scrollbar):
     ''' A scrollbar that hides itself if it's not needed.
         Works only if you use the grid geometry manager '''
