@@ -2,7 +2,6 @@
 # Advanced zoom example. Like in Google Maps.
 # It zooms only a tile, but not the whole image. So the zoomed tile occupies
 # constant memory and not crams it with a huge resized image for the large zooms.
-import random
 import tkinter as tk
 from tkinter import ttk
 from PIL import Image, ImageTk
@@ -36,7 +35,7 @@ class Zoom_Advanced(ttk.Frame):
         hbar.grid(row=1, column=0, sticky='we')
         # Create canvas and put image on it
         self.canvas = tk.Canvas(self.master, highlightthickness=0,
-                                xscrollcommand=hbar.set, yscrollcommand=vbar.set)
+                                xscrollcommand=hbar.set, yscrollcommand=vbar.set, width=1280, height=960)
         self.canvas.grid(row=0, column=0, sticky='nswe')
         self.canvas.update()  # wait till canvas is created
         vbar.configure(command=self.scroll_y)  # bind scrollbars to the canvas
@@ -57,15 +56,6 @@ class Zoom_Advanced(ttk.Frame):
         self.delta = 1.3  # zoom magnitude
         # Put image into container rectangle and use it to set proper coordinates to the image
         self.container = self.canvas.create_rectangle(0, 0, self.width, self.height, width=0)
-        # Plot some optional random rectangles for the test purposes
-        minsize, maxsize, number = 5, 20, 10
-        for n in range(number):
-            x0 = random.randint(0, self.width - maxsize)
-            y0 = random.randint(0, self.height - maxsize)
-            x1 = x0 + random.randint(minsize, maxsize)
-            y1 = y0 + random.randint(minsize, maxsize)
-            color = ('red', 'orange', 'yellow', 'green', 'blue')[random.randint(0, 4)]
-            self.canvas.create_rectangle(x0, y0, x1, y1, fill=color, activefill='black')
         self.show_image()
 
     def scroll_y(self, *args, **kwargs):

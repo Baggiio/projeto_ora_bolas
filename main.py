@@ -6,7 +6,7 @@ from alive_progress import alive_bar
 from tkinter import *
 from customtkinter import *
 from PIL import ImageTk, Image
-from zoom import Zoom_Advanced
+from zoom_advanced import Zoom_Advanced
 
 def interceptacao(sx, sy, arquivo):
 
@@ -405,35 +405,56 @@ def exibe_imagem(value):
     canvas.delete("all")
 
     if value == "Trajetória de interceptação":
-        img_trajetoria = ImageTk.PhotoImage(Image.open("results/trajetoria_de_interceptacao.png"))
-        canvas.create_image(0, 0, anchor=NW, image=img_trajetoria)
-        canvas.img = img_trajetoria
+        Zoom_Advanced(canvas, path="results/trajetoria_de_interceptacao.png")
+
     elif value == "Posição X por tempo":
-        img_posicao_x_tempo = ImageTk.PhotoImage(Image.open("results/posicao_x_tempo.png"))
-        canvas.create_image(0, 0, anchor=NW, image=img_posicao_x_tempo)
-        canvas.img = img_posicao_x_tempo
+        Zoom_Advanced(canvas, path="results/posicao_x_tempo.png")
     elif value == "Posição Y por tempo":
-        img_posicao_y_tempo = ImageTk.PhotoImage(Image.open("results/posicao_y_tempo.png"))
-        canvas.create_image(0, 0, anchor=NW, image=img_posicao_y_tempo)
-        canvas.img = img_posicao_y_tempo
+        Zoom_Advanced(canvas, path="results/posicao_y_tempo.png")
     elif value == "Velocidade X por tempo":
-        img_velocidade_x_tempo = ImageTk.PhotoImage(Image.open("results/velocidade_x_tempo.png"))
-        canvas.create_image(0, 0, anchor=NW, image=img_velocidade_x_tempo)
-        canvas.img = img_velocidade_x_tempo
+        Zoom_Advanced(canvas, path="results/velocidade_x_tempo.png")
     elif value == "Velocidade Y por tempo":
-        img_velocidade_y_tempo = ImageTk.PhotoImage(Image.open("results/velocidade_y_tempo.png"))
-        canvas.create_image(0, 0, anchor=NW, image=img_velocidade_y_tempo)
-        canvas.img = img_velocidade_y_tempo
+        Zoom_Advanced(canvas, path="results/velocidade_y_tempo.png")
     elif value == "Aceleração X por tempo":
-        img_aceleracao_x_tempo = ImageTk.PhotoImage(Image.open("results/aceleracao_x_tempo.png"))
-        canvas.create_image(0, 0, anchor=NW, image=img_aceleracao_x_tempo)
-        canvas.img = img_aceleracao_x_tempo
+        Zoom_Advanced(canvas, path="results/aceleracao_x_tempo.png")
     elif value == "Aceleração Y por tempo":
-        img_aceleracao_y_tempo = ImageTk.PhotoImage(Image.open("results/aceleracao_y_tempo.png"))
-        canvas.create_image(0, 0, anchor=NW, image=img_aceleracao_y_tempo)
-        canvas.img = img_aceleracao_y_tempo
+        Zoom_Advanced(canvas, path="results/aceleracao_y_tempo.png")
 
     window.update()
+
+# def exibe_imagem(value):
+#     canvas.delete("all")
+
+#     if value == "Trajetória de interceptação":
+#         img_trajetoria = ImageTk.PhotoImage(Image.open("results/trajetoria_de_interceptacao.png"))
+#         canvas.create_image(0, 0, anchor=NW, image=img_trajetoria)
+#         canvas.img = img_trajetoria
+#     elif value == "Posição X por tempo":
+#         img_posicao_x_tempo = ImageTk.PhotoImage(Image.open("results/posicao_x_tempo.png"))
+#         canvas.create_image(0, 0, anchor=NW, image=img_posicao_x_tempo)
+#         canvas.img = img_posicao_x_tempo
+#     elif value == "Posição Y por tempo":
+#         img_posicao_y_tempo = ImageTk.PhotoImage(Image.open("results/posicao_y_tempo.png"))
+#         canvas.create_image(0, 0, anchor=NW, image=img_posicao_y_tempo)
+#         canvas.img = img_posicao_y_tempo
+#     elif value == "Velocidade X por tempo":
+#         img_velocidade_x_tempo = ImageTk.PhotoImage(Image.open("results/velocidade_x_tempo.png"))
+#         canvas.create_image(0, 0, anchor=NW, image=img_velocidade_x_tempo)
+#         canvas.img = img_velocidade_x_tempo
+#     elif value == "Velocidade Y por tempo":
+#         img_velocidade_y_tempo = ImageTk.PhotoImage(Image.open("results/velocidade_y_tempo.png"))
+#         canvas.create_image(0, 0, anchor=NW, image=img_velocidade_y_tempo)
+#         canvas.img = img_velocidade_y_tempo
+#     elif value == "Aceleração X por tempo":
+#         img_aceleracao_x_tempo = ImageTk.PhotoImage(Image.open("results/aceleracao_x_tempo.png"))
+#         canvas.create_image(0, 0, anchor=NW, image=img_aceleracao_x_tempo)
+#         canvas.img = img_aceleracao_x_tempo
+#     elif value == "Aceleração Y por tempo":
+#         img_aceleracao_y_tempo = ImageTk.PhotoImage(Image.open("results/aceleracao_y_tempo.png"))
+#         canvas.create_image(0, 0, anchor=NW, image=img_aceleracao_y_tempo)
+#         canvas.img = img_aceleracao_y_tempo
+
+#     window.update()
 
 # cria label menu gráfico
 label_graficos = CTkLabel(frame1, text="Selecione o gráfico desejado:", anchor="center")
