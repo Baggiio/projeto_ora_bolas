@@ -30,6 +30,13 @@ except ImportError or ModuleNotFoundError:
     subprocess.check_call([sys.executable, "-m", "pip", "install", "customtkinter"])
     from customtkinter import *
 
+try:
+    from PIL import ImageTk, Image
+except ImportError or ModuleNotFoundError:
+    print("PIL não instalado. Instalando...")
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "pillow"])
+    from PIL import ImageTk, Image
+
 def interceptacao(sx, sy, arquivo):
 
     # Incializa as listas vazias para armazenar os valores de t, x e y
@@ -230,6 +237,21 @@ def interceptacao(sx, sy, arquivo):
     for i in range(len(lt)):
         aby.append(fddy[0])
 
+    # Cria a lista de distãncias entre a bola e o robô
+    dist = []
+    t_dist = []
+    for i in range(len(lt)):
+        if wait == 1 and lt[i] >= tempo_chegada:
+            rx_all = lx[waitj+2]
+            ry_all = ly[waitj+2]
+        else:
+            rx_all = sx + vxf*lt[i]
+            ry_all = sy + vyf*lt[i]
+        dist.append(sqrt((lx[i]-rx_all)**2 + (ly[i]-ry_all)**2))
+        t_dist.append(lt[i])
+        if lt[i] >= tempo:
+            break
+
     # Plota o gráfico das trajetórias no plano
     fig, ax1 = plt.subplots()
     if wait == 0:
@@ -261,7 +283,7 @@ def interceptacao(sx, sy, arquivo):
     else:
         ax2.plot([lt[0], tempo_chegada], rx, marker = 'o', color = 'red', label="Robô")
         ax2.plot(tempo, rx[1], marker = 'o', color = 'red')
-    ax2.text(tempo + 0.5, rx[1] - 0.1, ("Interceptação (t = %.2f)" % tempo), fontsize=10, color="red")
+    ax2.text(tempo + 0.5, rx[1] - 0.1, ("Interceptação (t = %.2f s)" % tempo), fontsize=10, color="red")
     ax2.set(title = "Posição x da bola e do robô em função do tempo", xlabel = "t (s)", ylabel = "x (m)")
     ax2.minorticks_on()
     ax2.legend()
@@ -280,7 +302,7 @@ def interceptacao(sx, sy, arquivo):
     else:
         ax3.plot([lt[0], tempo_chegada], ry, marker = 'o', color = 'red', label="Robô")
         ax3.plot(tempo, ry[1], marker = 'o', color = 'red')
-    ax3.text(tempo + 0.5, ry[1] - 0.1, ("Interceptação (t = %.2f)" % tempo), fontsize=10, color="red")
+    ax3.text(tempo + 0.5, ry[1] - 0.1, ("Interceptação (t = %.2f s)" % tempo), fontsize=10, color="red")
     ax3.set(title = "Posição y da bola e do robô em função do tempo", xlabel = "t (s)", ylabel = "y (m)")
     ax3.minorticks_on()
     ax3.legend()
@@ -293,8 +315,9 @@ def interceptacao(sx, sy, arquivo):
 
     # Plota a velocidade x da bola e do robô pelo tempo
     fig, ax4 = plt.subplots()
-    ax4.plot(lt, vbx, label="Bola")
-    ax4.plot([lt[0], lt[-1]], [vxf, vxf], color = 'red', label="Robô")
+    ax4.plot(lt, vbx, label="Bola", marker='o', markevery=[0, -1])
+    ax4.plot([lt[0], lt[-1]], [vxf, vxf], color = 'red', label="Robô", marker='o', markevery=[0, -1])
+    ax4.annotate(('%.2f m/s' % vxf), (lt[0] + 0.5, vxf + 0.2), color = 'red')
     ax4.set(title = "Velocidade x da bola e do robô em função do tempo", xlabel = "t (s)", ylabel = "Vx (m/s)")
     ax4.minorticks_on()
     ax4.legend()
@@ -307,8 +330,9 @@ def interceptacao(sx, sy, arquivo):
 
     # Plota a velocidade y da bola e do robô pelo tempo
     fig, ax5 = plt.subplots()
-    ax5.plot(lt, vby, label="Bola")
-    ax5.plot([lt[0], lt[-1]], [vyf, vyf], color = 'red', label="Robô")
+    ax5.plot(lt, vby, label="Bola", marker='o', markevery=[0, -1])
+    ax5.plot([lt[0], lt[-1]], [vyf, vyf], color = 'red', label="Robô", marker='o', markevery=[0, -1])
+    ax5.annotate(('%.2f m/s' % vyf), (lt[0] + 0.5, vyf + 0.2), color = 'red')
     ax5.set(title = "Velocidade y da bola e do robô em função do tempo", xlabel = "t (s)", ylabel = "Vy (m/s)")
     ax5.minorticks_on()
     ax5.legend()
@@ -321,8 +345,9 @@ def interceptacao(sx, sy, arquivo):
 
     # Plota a aceleração x da bola e do robô pelo tempo
     fig, ax6 = plt.subplots()
-    ax6.plot(lt, abx, label="Bola")
-    ax6.plot([lt[0], lt[-1]], [0, 0], color = 'red', label="Robô")
+    ax6.plot(lt, abx, label="Bola", marker='o', markevery=[0, -1])
+    ax6.plot([lt[0], lt[-1]], [0, 0], color = 'red', label="Robô", marker='o', markevery=[0, -1])
+    ax6.annotate(("%.2f m/s²" % 0), (lt[0], 0.002), color = 'red')
     ax6.set(title = "Aceleração x da bola e do robô em função do tempo", xlabel = "t (s)", ylabel = "Ax (m/s²)")
     ax6.minorticks_on()
     ax6.legend()
@@ -335,8 +360,9 @@ def interceptacao(sx, sy, arquivo):
 
     # Plota a aceleração y da bola e do robô pelo tempo
     fig, ax7 = plt.subplots()
-    ax7.plot(lt, aby, label="Bola")
-    ax7.plot([lt[0], lt[-1]], [0, 0], color = 'red', label="Robô")
+    ax7.plot(lt, aby, label="Bola", marker='o', markevery=[0, -1])
+    ax7.plot([lt[0], lt[-1]], [0, 0], color = 'red', label="Robô", marker='o', markevery=[0, -1])
+    ax7.annotate(("%.2f m/s²" % 0), (lt[0], 0.002), color = 'red')
     ax7.set(title = "Aceleração y da bola e do robô em função do tempo", xlabel = "t (s)", ylabel = "Ay (m/s²)")
     ax7.minorticks_on()
     ax7.legend()
@@ -347,13 +373,26 @@ def interceptacao(sx, sy, arquivo):
     plt.savefig("results/aceleracao_y_tempo.png", dpi=200)
     plt.clf()
 
+    # Plota a distancia relativa entre bola e robô
+    fig, ax8 = plt.subplots()
+    ax8.plot(t_dist, dist, label="Distancia Relativa", marker='o', markevery=[0, -1])
+    ax8.annotate(("%.4f m" % 0.0965), xy=(t_dist[dist.index(min(dist))], min(dist)), xytext=(t_dist[dist.index(min(dist))], min(dist) + 0.1), color = "C0")
+    ax8.set(title = "Distância relativa entre robô e bola em função do tempo", xlabel = "t (s)", ylabel = "d (m)")
+    ax8.minorticks_on()
+    ax8.grid(which='both')
+    ax8.grid(which='minor', alpha=0.2)
+    ax8.grid(which='major', alpha=0.5)
+    plt.tight_layout()
+    plt.savefig("results/distancia_relativa.png", dpi=200)
+    plt.clf()
+
     # Exibe os resultados
     label_results.configure(text="Ponto de interceptação no menor tempo encontrado!")
     if wait == 1:
-        label_wait.configure(text=("O robô chegará no instante t = %.2f e deverá\nesperar a bola retornar ao campo." % tempo_chegada))
+        label_wait.configure(text=("O robô chegará no instante t = %.2f s e deverá\nesperar a bola retornar ao campo." % tempo_chegada))
     else:
         label_wait.configure(text='')
-    label_intercept.configure(text=("O robô interceptará a bola no instante t = %.2f." % tempo))
+    label_intercept.configure(text=("O robô interceptará a bola no instante t = %.2f s." % tempo))
     label_velocidade.configure(text=("Para isso, o robô deve utilizar uma velocidade de Vx = %.2f e Vy = %.2f." % (vxf, vyf)))
 
 # configura a aparencia da janela
@@ -375,6 +414,8 @@ window.state("zoomed")
 # cria os frames (divisoes) do programa
 frame1 = CTkFrame(window)
 frame2 = CTkFrame(window, border_color="black", border_width=5, corner_radius=10)
+frame3 = CTkFrame(window, border_color="black", border_width=5, corner_radius=10)
+
 #frame2 = Frame(window)
 
 # cria label de seleção de trajetoria
@@ -414,8 +455,6 @@ def run():
 
     valor = menu_grafico.get()
     exibe_imagem(valor)
-
-    frame2.pack(side=RIGHT, padx=10, pady=10, expand=True)
     
 # cria botão de execução
 calcular = CTkButton(master=frame1, text="Calcular", command=run, height=40, width=200)
@@ -429,6 +468,8 @@ progress_bar.pack(anchor=W, padx=10, pady=10)
 # exibe imagem com zoom:
 def exibe_imagem(value):
     canvas.delete("all")
+    frame3.pack_forget()
+    frame2.pack(side=RIGHT, padx=10, pady=10, expand=True)
 
     if value == "Trajetória de interceptação":
         Zoom_Advanced(canvas, path="results/trajetoria_de_interceptacao.png")
@@ -444,6 +485,11 @@ def exibe_imagem(value):
         Zoom_Advanced(canvas, path="results/aceleracao_x_tempo.png")
     elif value == "Aceleração Y por tempo":
         Zoom_Advanced(canvas, path="results/aceleracao_y_tempo.png")
+    elif value == "Distância Relativa":
+        Zoom_Advanced(canvas, path="results/distancia_relativa.png")
+    elif value == "Simulação":
+        frame2.pack_forget()
+        frame3.pack(side=RIGHT, padx=10, pady=10, expand=True)
 
     window.update()
 
@@ -486,13 +532,32 @@ label_graficos = CTkLabel(frame1, text="Selecione o gráfico desejado:", anchor=
 label_graficos.pack(anchor=W, padx=10, pady=0)
 
 # cria o menu de seleção de gráfico
-menu_grafico = CTkOptionMenu(master=frame1, values=["Trajetória de interceptação", "Posição X por tempo", "Posição Y por tempo", "Velocidade X por tempo", "Velocidade Y por tempo", "Aceleração X por tempo", "Aceleração Y por tempo"], height=40, width=200, command=exibe_imagem)
+menu_grafico = CTkOptionMenu(master=frame1, values=["Trajetória de interceptação", "Posição X por tempo", "Posição Y por tempo", "Velocidade X por tempo", "Velocidade Y por tempo", "Aceleração X por tempo", "Aceleração Y por tempo", "Distância Relativa", "Simulação"], height=40, width=200, command=exibe_imagem)
 menu_grafico.pack(anchor=W, padx=10, pady=10)
 menu_grafico.set("Trajetória de interceptação")
 
 # cria o canvas para exibir as imagens
 canvas = Canvas(frame2, width=1280, height=960)
 canvas.pack(anchor=CENTER, padx=10, pady=10)
+
+# cria o canvas do campo
+canvas_campo = Canvas(frame3, width=900, height=600)
+canvas_campo.pack(anchor=SW, padx=10, pady=10)
+
+# abre a imagem do robo e da bola
+img_robo = ImageTk.PhotoImage(Image.open("images/robot.png"))
+img_bola = ImageTk.PhotoImage(Image.open("images/ball.png"))
+
+# abre a imagem do campo
+img_campo = ImageTk.PhotoImage(Image.open("images/campo.png"))
+
+# exibe a imagem do campo no canvas_campo
+canvas_campo.create_image(0, 0, anchor=CENTER, image=img_campo)
+canvas_campo.img = img_campo
+
+# cria o botão para iniciar a simulação
+button_iniciar = CTkButton(frame3, text="Iniciar")
+button_iniciar.pack(anchor=CENTER, padx=10, pady=10)
 
 # cria os labels de resultado
 label_results = CTkLabel(frame1, text='')
