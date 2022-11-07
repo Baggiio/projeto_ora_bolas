@@ -1,6 +1,7 @@
 from math import *
 import os, subprocess, sys
 from zoom_advanced import Zoom_Advanced
+from time import sleep
 
 try:
     import numpy as np
@@ -40,6 +41,7 @@ except ImportError or ModuleNotFoundError:
 def interceptacao(sx, sy, arquivo):
 
     # Incializa as listas vazias para armazenar os valores de t, x e y
+    global lx, ly
     lt = []; lx = []; ly = []
     nt = []; nx = []; ny = []
 
@@ -59,15 +61,15 @@ def interceptacao(sx, sy, arquivo):
                 nx.append(l[1])
                 ny.append(l[2])
 
-    # Aproxima uma função polinomial para os valores de x e y
+    # Aproxima uma função polinomial para a trajetória da bola
     fx = np.polyfit(lt, lx, 3).tolist()
     fy = np.polyfit(lt, ly, 2).tolist()
 
-    # Deriva a função polinomial para obter a velocidade
+    # Deriva a posição para obter a velocidade
     fdx = np.polyder(fx).tolist()
     fdy = np.polyder(fy).tolist()
 
-    # Deriva a função polinomial para obter a aceleração
+    # Deriva a velocidade para obter a aceleração
     fddx = np.polyder(fdx).tolist()
     fddy = np.polyder(fdy).tolist()
 
@@ -252,6 +254,20 @@ def interceptacao(sx, sy, arquivo):
         if lt[i] >= tempo:
             break
 
+    global rx_return, ry_return, t_return
+
+    rx_return = []
+    ry_return = []
+    t_return = []
+    for i in range(len(lt)):
+        if wait == 1 and lt[i] > tempo_chegada:
+            break
+        t_return.append(lt[i])
+        rx_return.append(sx + vxf*lt[i])
+        ry_return.append(sy + vyf*lt[i])
+        if lt[i] >= tempo:
+            break
+
     # Plota o gráfico das trajetórias no plano
     fig, ax1 = plt.subplots()
     if wait == 0:
@@ -395,6 +411,7 @@ def interceptacao(sx, sy, arquivo):
     label_intercept.configure(text=("O robô interceptará a bola no instante t = %.2f s." % tempo))
     label_velocidade.configure(text=("Para isso, o robô deve utilizar uma velocidade de Vx = %.2f e Vy = %.2f." % (vxf, vyf)))
 
+
 # configura a aparencia da janela
 set_appearance_mode("light")  # Modes: system (default), light, dark
 set_default_color_theme("green") # Themes: blue (default), dark-blue, green
@@ -455,6 +472,19 @@ def run():
 
     valor = menu_grafico.get()
     exibe_imagem(valor)
+
+    # cria o campo
+    canvas_campo.delete("all")
+    canvas_campo.create_image(0, 0, image=img_campo, anchor=NW)
+    canvas_campo.img = img_campo
+
+    # cria o robo
+    canvas_campo.create_image(sx*142.23, sy*142.17, anchor=NW, image=img_robo)
+    canvas_campo.img = img_robo
+
+    # cria a bola
+    canvas_campo.create_image(lx[0]*142.23, ly[0]*142.17, anchor=NW, image=img_bola)
+    canvas_campo.imgbola = img_bola
     
 # cria botão de execução
 calcular = CTkButton(master=frame1, text="Calcular", command=run, height=40, width=200)
@@ -493,42 +523,8 @@ def exibe_imagem(value):
 
     window.update()
 
-# exibe imagem sem zoom:
-
-# def exibe_imagem(value):
-#     canvas.delete("all")
-#     if value == "Trajetória de interceptação":
-#         img_trajetoria = ImageTk.PhotoImage(Image.open("results/trajetoria_de_interceptacao.png"))
-#         canvas.create_image(0, 0, anchor=NW, image=img_trajetoria)
-#         canvas.img = img_trajetoria
-#     elif value == "Posição X por tempo":
-#         img_posicao_x_tempo = ImageTk.PhotoImage(Image.open("results/posicao_x_tempo.png"))
-#         canvas.create_image(0, 0, anchor=NW, image=img_posicao_x_tempo)
-#         canvas.img = img_posicao_x_tempo
-#     elif value == "Posição Y por tempo":
-#         img_posicao_y_tempo = ImageTk.PhotoImage(Image.open("results/posicao_y_tempo.png"))
-#         canvas.create_image(0, 0, anchor=NW, image=img_posicao_y_tempo)
-#         canvas.img = img_posicao_y_tempo
-#     elif value == "Velocidade X por tempo":
-#         img_velocidade_x_tempo = ImageTk.PhotoImage(Image.open("results/velocidade_x_tempo.png"))
-#         canvas.create_image(0, 0, anchor=NW, image=img_velocidade_x_tempo)
-#         canvas.img = img_velocidade_x_tempo
-#     elif value == "Velocidade Y por tempo":
-#         img_velocidade_y_tempo = ImageTk.PhotoImage(Image.open("results/velocidade_y_tempo.png"))
-#         canvas.create_image(0, 0, anchor=NW, image=img_velocidade_y_tempo)
-#         canvas.img = img_velocidade_y_tempo
-#     elif value == "Aceleração X por tempo":
-#         img_aceleracao_x_tempo = ImageTk.PhotoImage(Image.open("results/aceleracao_x_tempo.png"))
-#         canvas.create_image(0, 0, anchor=NW, image=img_aceleracao_x_tempo)
-#         canvas.img = img_aceleracao_x_tempo
-#     elif value == "Aceleração Y por tempo":
-#         img_aceleracao_y_tempo = ImageTk.PhotoImage(Image.open("results/aceleracao_y_tempo.png"))
-#         canvas.create_image(0, 0, anchor=NW, image=img_aceleracao_y_tempo)
-#         canvas.img = img_aceleracao_y_tempo
-#     window.update()
-
 # cria label menu gráfico
-label_graficos = CTkLabel(frame1, text="Selecione o gráfico desejado:", anchor="center")
+label_graficos = CTkLabel(frame1, text="Selecione a saída desejada:", anchor="center")
 label_graficos.pack(anchor=W, padx=10, pady=0)
 
 # cria o menu de seleção de gráfico
@@ -541,22 +537,62 @@ canvas = Canvas(frame2, width=1280, height=960)
 canvas.pack(anchor=CENTER, padx=10, pady=10)
 
 # cria o canvas do campo
-canvas_campo = Canvas(frame3, width=900, height=600)
-canvas_campo.pack(anchor=SW, padx=10, pady=10)
+canvas_campo = Canvas(frame3, width=1280, height=853)
+canvas_campo.pack(anchor=SE, padx=10, pady=10)
 
-# abre a imagem do robo e da bola
-img_robo = ImageTk.PhotoImage(Image.open("images/robot.png"))
+# abre a imagem da bola e do robo
 img_bola = ImageTk.PhotoImage(Image.open("images/ball.png"))
 
 # abre a imagem do campo
 img_campo = ImageTk.PhotoImage(Image.open("images/campo.png"))
+img_robo = ImageTk.PhotoImage(Image.open("images/robot.png").rotate(180))
 
 # exibe a imagem do campo no canvas_campo
-canvas_campo.create_image(0, 0, anchor=CENTER, image=img_campo)
+canvas_campo.create_image(0, 0, anchor=SW, image=img_campo)
 canvas_campo.img = img_campo
 
+def iniciar_simulacao():
+    tg = (lx[len(t_return)]-rx_return[0])/(ly[len(t_return)]-ry_return[0])
+    ang = atan(tg)
+    ang = degrees(ang)
+    if rx_return[0] > lx[len(t_return)] and ry_return[0] > ly[len(t_return)]:
+        ang = -ang
+    elif rx_return[0] > lx[len(t_return)] and ry_return[0] < ly[len(t_return)]:
+        ang = -ang
+    else:
+        ang = 180 - ang
+    img_robo = ImageTk.PhotoImage(Image.open("images/robot.png").rotate(ang))
+    canvas.test = img_robo
+
+    for i in range(len(t_return)):
+        canvas_campo.delete("all")
+        canvas_campo.create_image(0, 0, anchor=NW, image=img_campo)
+        canvas_campo.img = img_campo
+        if i > len(t_return) - 2:
+            canvas_campo.create_image(rx_return[len(t_return)-2]*142.23, ry_return[len(t_return)-2]*142.17, anchor=CENTER, image=img_robo)
+        else:
+            canvas_campo.create_image(rx_return[i]*142.23, ry_return[i]*142.17, anchor=CENTER, image=img_robo)
+        canvas_campo.create_image(lx[i]*142.23, ly[i]*142.17, anchor=CENTER, image=img_bola)
+        canvas_campo.update()
+        sleep(0.02)
+
+    sleep(3)
+
+    # cria o campo
+    canvas_campo.delete("all")
+    canvas_campo.create_image(0, 0, image=img_campo, anchor=NW)
+    canvas_campo.img = img_campo
+
+    # cria o robo
+    canvas_campo.create_image(rx_return[0]*142.23, ry_return[0]*142.17, anchor=NW, image=img_robo)
+    canvas_campo.img = img_robo
+
+    # cria a bola
+    canvas_campo.create_image(lx[0]*142.23, ly[0]*142.17, anchor=NW, image=img_bola)
+    canvas_campo.imgbola = img_bola
+
 # cria o botão para iniciar a simulação
-button_iniciar = CTkButton(frame3, text="Iniciar")
+button_iniciar = CTkButton(frame3, text="Iniciar", command=iniciar_simulacao)
 button_iniciar.pack(anchor=CENTER, padx=10, pady=10)
 
 # cria os labels de resultado
