@@ -479,11 +479,11 @@ def run():
     canvas_campo.img = img_campo
 
     # cria o robo
-    canvas_campo.create_image(sx*142.23, sy*142.17, anchor=NW, image=img_robo)
+    canvas_campo.create_image(sx*142.23, 853-(sy*142.17), anchor=NW, image=img_robo)
     canvas_campo.img = img_robo
 
     # cria a bola
-    canvas_campo.create_image(lx[0]*142.23, ly[0]*142.17, anchor=NW, image=img_bola)
+    canvas_campo.create_image(lx[0]*142.23, 853-(ly[0]*142.17), anchor=NW, image=img_bola)
     canvas_campo.imgbola = img_bola
     
 # cria botão de execução
@@ -555,13 +555,13 @@ def iniciar_simulacao():
     tg = (lx[len(t_return)]-rx_return[0])/(ly[len(t_return)]-ry_return[0])
     ang = atan(tg)
     ang = degrees(ang)
-    if rx_return[0] > lx[len(t_return)] and ry_return[0] > ly[len(t_return)]:
+    if rx_return[0] > lx[len(t_return)] and ry_return[0] < ly[len(t_return)]:
         ang = -ang
-    elif rx_return[0] > lx[len(t_return)] and ry_return[0] < ly[len(t_return)]:
-        ang = -ang
+    elif rx_return[0] > lx[len(t_return)] and ry_return[0] > ly[len(t_return)]:
+        ang = ang + 90
     else:
-        ang = 180 - ang
-    img_robo = ImageTk.PhotoImage(Image.open("images/robot.png").rotate(ang))
+        ang = ang - 90
+    img_robo = ImageTk.PhotoImage(Image.open("images/robot.png").rotate(270+ang))
     canvas.test = img_robo
 
     for i in range(len(t_return)):
@@ -569,10 +569,10 @@ def iniciar_simulacao():
         canvas_campo.create_image(0, 0, anchor=NW, image=img_campo)
         canvas_campo.img = img_campo
         if i > len(t_return) - 2:
-            canvas_campo.create_image(rx_return[len(t_return)-2]*142.23, ry_return[len(t_return)-2]*142.17, anchor=CENTER, image=img_robo)
+            canvas_campo.create_image(rx_return[len(t_return)-2]*142.23, 853-(ry_return[len(t_return)-2]*142.17), anchor=CENTER, image=img_robo)
         else:
-            canvas_campo.create_image(rx_return[i]*142.23, ry_return[i]*142.17, anchor=CENTER, image=img_robo)
-        canvas_campo.create_image(lx[i]*142.23, ly[i]*142.17, anchor=CENTER, image=img_bola)
+            canvas_campo.create_image(rx_return[i]*142.23, 853-(ry_return[i]*142.17), anchor=CENTER, image=img_robo)
+        canvas_campo.create_image(lx[i]*142.23, 853-(ly[i]*142.17), anchor=CENTER, image=img_bola)
         canvas_campo.update()
         sleep(0.02)
 
@@ -584,11 +584,11 @@ def iniciar_simulacao():
     canvas_campo.img = img_campo
 
     # cria o robo
-    canvas_campo.create_image(rx_return[0]*142.23, ry_return[0]*142.17, anchor=NW, image=img_robo)
+    canvas_campo.create_image(rx_return[0]*142.23, 853-(ry_return[0]*142.17), anchor=NW, image=img_robo)
     canvas_campo.img = img_robo
 
     # cria a bola
-    canvas_campo.create_image(lx[0]*142.23, ly[0]*142.17, anchor=NW, image=img_bola)
+    canvas_campo.create_image(lx[0]*142.23, 853-(ly[0]*142.17), anchor=NW, image=img_bola)
     canvas_campo.imgbola = img_bola
 
 # cria o botão para iniciar a simulação
