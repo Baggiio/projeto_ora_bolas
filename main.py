@@ -392,7 +392,7 @@ def interceptacao(sx, sy, arquivo):
     # Plota a distancia relativa entre bola e robô
     fig, ax8 = plt.subplots()
     ax8.plot(t_dist, dist, label="Distancia Relativa", marker='o', markevery=[0, -1])
-    ax8.annotate(("%.4f m" % 0.0965), xy=(t_dist[dist.index(min(dist))], min(dist)), xytext=(t_dist[dist.index(min(dist))], min(dist) + 0.1), color = "C0")
+    ax8.annotate(("min\n%.4f m" % 0.0965), xy=(t_dist[dist.index(min(dist))], min(dist)), xytext=(t_dist[dist.index(min(dist))], min(dist) + 0.1), color = "C0")
     ax8.set(title = "Distância relativa entre robô e bola em função do tempo", xlabel = "t (s)", ylabel = "d (m)")
     ax8.minorticks_on()
     ax8.grid(which='both')
